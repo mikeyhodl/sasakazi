@@ -26,7 +26,7 @@ form.addEventListener("submit", (e) => {
     .then((result) => {
       weatherDiv.innerHTML = `
                   <h2>Weather in ${result.location.name}, ${result.location.country} </h2>
-                  <p><strong>Current Time:</strong> ${result.location.localtime}</p>
+                  <p><strong>Current Local Time:</strong> ${result.location.localtime}</p>
                   <p><strong>Temperature:</strong> ${result.current.temp_c}&#176;C</p>
                   <p><strong>Weather:</strong> ${result.current.condition.text}</p>
                   <img src="${result.current.condition.icon}" />
