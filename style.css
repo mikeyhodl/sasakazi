@@ -1,0 +1,18 @@
+h1 {
+  text-align: center;
+  margin-top: 4vh;
+}
+div {
+  text-align: center;
+  margin-bottom: 4vh;
+}
+#location {
+  width: calc(2 rem);
+  text-align: center;
+}
+form {
+  display: inline-block;
+}
+body{
+    background-color: azure;
+}
