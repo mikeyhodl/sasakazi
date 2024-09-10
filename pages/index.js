@@ -22,6 +22,7 @@ export default function Home() {
             </label>
             <br />
             <input
+              autoComplete="off"
               type="text"
               name="location"
               id="location"
