@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { getWeatherData } from "../requests/weather";
 
@@ -9,14 +9,14 @@ export default function Home() {
   const [weatherData, setWeatherData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isDetectingLocation, setIsDetectingLocation] = useState(true);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const fetchWeatherData = async (locationQuery: string) => {
     setLoading(true);
     setError("");
 
     try {
-      const data = await getWeatherData(location);
+      const data = await getWeatherData(locationQuery);
       setWeatherData(data);
     } catch (err) {
       setError("Failed to fetch weather data. Please try again.");
@@ -25,12 +25,53 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    const detectLocation = async () => {
+      if (!navigator.geolocation) {
+        setError("Geolocation is not supported by your browser");
+        setIsDetectingLocation(false);
+        return;
+      }
+
+      try {
+        const position = await new Promise<GeolocationPosition>(
+          (resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+          }
+        );
+
+        const { latitude, longitude } = position.coords;
+        await fetchWeatherData(`${latitude},${longitude}`);
+      } catch (err) {
+        setError(
+          "Unable to detect your location. Please enter a location manually."
+        );
+      } finally {
+        setIsDetectingLocation(false);
+      }
+    };
+
+    detectLocation();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await fetchWeatherData(location);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-100 to-blue-200 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">
           Rapid Weather
         </h1>
+
+        {isDetectingLocation && (
+          <div className="text-center mb-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p className="mt-2 text-gray-600">Detecting your location...</p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="mb-8">
           <div className="flex gap-2">
